@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Description: Lambda for Pipeline Integrations.
 Parameters:
   IntegrationType:
@@ -19,7 +19,7 @@ Parameters:
   EncryptionAtRest:
     Type: String
     Default: "Yes"
-    AllowedValues: 
+    AllowedValues:
       - "Yes"
       - "No"
     Description: Enable encryption at rest for SNS topic
@@ -34,51 +34,51 @@ Resources:
     Properties:
       Description: !Sub "CMK for SNS Topic for encryption at rest in ${AWS::StackName}"
       KeyPolicy:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
-        - Sid: Enable IAM User Permissions
-          Effect: Allow
-          Principal:
-            AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
-          Action: kms:*
-          Resource: '*'
-        - Sid: Allow administration of the key
-          Effect: Allow
-          Principal:
-            AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:role/Admin'
-          Action:
-          - kms:Create*
-          - kms:Describe*
-          - kms:Enable*
-          - kms:List*
-          - kms:Put*
-          - kms:Update*
-          - kms:Revoke*
-          - kms:Disable*
-          - kms:Get*
-          - kms:Delete*
-          - kms:ScheduleKeyDeletion
-          - kms:CancelKeyDeletion
-          Resource: '*'
-        - Sid: Allow codestar
-          Effect: Allow
-          Principal:
-            Service: "codestar-notifications.amazonaws.com"
-          Action:
-            - kms:GenerateDataKey*
-            - kms:Decrypt
-          Resource: "*"
-          Condition:
-            StringEquals:
-              "kms:ViaService": !Sub 'sns.${AWS::Region}.amazonaws.com'
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: kms:*
+            Resource: "*"
+          - Sid: Allow administration of the key
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/Admin"
+            Action:
+              - kms:Create*
+              - kms:Describe*
+              - kms:Enable*
+              - kms:List*
+              - kms:Put*
+              - kms:Update*
+              - kms:Revoke*
+              - kms:Disable*
+              - kms:Get*
+              - kms:Delete*
+              - kms:ScheduleKeyDeletion
+              - kms:CancelKeyDeletion
+            Resource: "*"
+          - Sid: Allow codestar
+            Effect: Allow
+            Principal:
+              Service: "codestar-notifications.amazonaws.com"
+            Action:
+              - kms:GenerateDataKey*
+              - kms:Decrypt
+            Resource: "*"
+            Condition:
+              StringEquals:
+                "kms:ViaService": !Sub "sns.${AWS::Region}.amazonaws.com"
   PipelineNotificationSNSTopic:
     Type: AWS::SNS::Topic
     Properties:
       KmsMasterKeyId:
         Fn::If:
-        - UseCMK
-        - !Ref SNSTopicEncryptionKey
-        - !Ref AWS::NoValue
+          - UseCMK
+          - !Ref SNSTopicEncryptionKey
+          - !Ref AWS::NoValue
       Subscription:
         - Endpoint: !GetAtt PipelineNotificationFunction.Arn
           Protocol: "lambda"
@@ -86,7 +86,7 @@ Resources:
     Type: AWS::SNS::TopicPolicy
     Properties:
       PolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Sid: SnsTopicPolicy
             Effect: Allow
@@ -101,7 +101,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
@@ -113,7 +113,7 @@ Resources:
       Policies:
         - PolicyName: root
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -126,18 +126,18 @@ Resources:
                   - codepipeline:GetPipelineExecution
                 Resource: arn:aws:codepipeline:*:*:*
   PipelineNotificationRule:
-    Type: 'AWS::CodeStarNotifications::NotificationRule'
+    Type: "AWS::CodeStarNotifications::NotificationRule"
     Properties:
-      Name: !Sub 'Notification for ${PipelineName}'
+      Name: !Sub "Notification for ${PipelineName}"
       DetailType: FULL
-      Resource: !Sub 'arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${PipelineName}'
+      Resource: !Sub "arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${PipelineName}"
       EventTypeIds:
-       - codepipeline-pipeline-pipeline-execution-failed
-       - codepipeline-pipeline-pipeline-execution-canceled
-       - codepipeline-pipeline-pipeline-execution-started
-       - codepipeline-pipeline-pipeline-execution-resumed
-       - codepipeline-pipeline-pipeline-execution-succeeded
-       - codepipeline-pipeline-pipeline-execution-superseded
+        - codepipeline-pipeline-pipeline-execution-failed
+        - codepipeline-pipeline-pipeline-execution-canceled
+        - codepipeline-pipeline-pipeline-execution-started
+        - codepipeline-pipeline-pipeline-execution-resumed
+        - codepipeline-pipeline-pipeline-execution-succeeded
+        - codepipeline-pipeline-pipeline-execution-superseded
       Targets:
         - TargetType: SNS
           TargetAddress: !Ref PipelineNotificationSNSTopic
@@ -193,7 +193,6 @@ Resources:
             )
 
             print(response)
-            short_commit_od = response['pipelineExecution']['artifactRevisions'][0]['revisionId'][0:7]
             commit_id = response['pipelineExecution']['artifactRevisions'][0]['revisionId']
             revision_url = response['pipelineExecution']['artifactRevisions'][0]['revisionUrl']
 
