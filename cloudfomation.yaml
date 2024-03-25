@@ -7,16 +7,11 @@ Parameters:
       - "Bitbucket"
       - "GitHub"
     Description: Enter Bitbucket or GitHub
-  IntegrationUser:
+  IntegrationToken:
     NoEcho: true
     Type: String
     MinLength: 1
-    Description: Enter Bitbucket or GitHub API username
-  IntegrationPass:
-    NoEcho: true
-    Type: String
-    MinLength: 1
-    Description: Enter Bitbucket or GitHub API password
+    Description: Enter Bitbucket or GitHub API bearer token
   PipelineName:
     Type: String
     MinLength: 1
@@ -164,8 +159,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          INTEGRATION_AUTH_USER: !Ref IntegrationUser
-          INTEGRATION_AUTH_PASS: !Ref IntegrationPass
+          INTEGRATION_AUTH_TOKEN: !Ref IntegrationToken
           INTEGRATION_TYPE: !Ref IntegrationType
 
       Code:
@@ -179,11 +173,8 @@ Resources:
           from base64 import b64encode
 
           codepipeline_client = boto3.client('codepipeline')
-          integration_user = os.environ['INTEGRATION_AUTH_USER']
-          integration_pass = os.environ['INTEGRATION_AUTH_PASS']
+          integration_token = os.environ['INTEGRATION_AUTH_TOKEN']
           integration_type = os.environ['INTEGRATION_TYPE']
-          user_pass = integration_user+":"+integration_pass
-
 
           region = os.environ['AWS_REGION']
 
@@ -249,11 +240,11 @@ Resources:
             else:
               return()
 
-            encode_user_pass = b64encode(user_pass.encode()).decode()
+            encode_token = b64encode(integration_token.encode()).decode()
 
             http = urllib3.PoolManager()
             r = http.request('POST', url,
-            headers={'Accept': 'application/json', 'Content-Type': 'application/json', 'User-Agent': 'Curl/0.1', 'Authorization' : 'Basic %s' %  encode_user_pass},
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json', 'User-Agent': 'Curl/0.1', 'Authorization' : 'Bearer %s' %  encode_token},
             body=json.dumps(build_status).encode('utf-8')
             )
 
