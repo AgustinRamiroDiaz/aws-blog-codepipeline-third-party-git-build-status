@@ -42,24 +42,25 @@ Resources:
               AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
             Action: kms:*
             Resource: "*"
-          - Sid: Allow administration of the key
-            Effect: Allow
-            Principal:
-              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/Admin"
-            Action:
-              - kms:Create*
-              - kms:Describe*
-              - kms:Enable*
-              - kms:List*
-              - kms:Put*
-              - kms:Update*
-              - kms:Revoke*
-              - kms:Disable*
-              - kms:Get*
-              - kms:Delete*
-              - kms:ScheduleKeyDeletion
-              - kms:CancelKeyDeletion
-            Resource: "*"
+          # Commented out as per https://github.com/aws-samples/aws-blog-codepipeline-third-party-git-build-status/issues/6
+          # - Sid: Allow administration of the key
+          #   Effect: Allow
+          #   Principal:
+          #     AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/Admin"
+          #   Action:
+          #     - kms:Create*
+          #     - kms:Describe*
+          #     - kms:Enable*
+          #     - kms:List*
+          #     - kms:Put*
+          #     - kms:Update*
+          #     - kms:Revoke*
+          #     - kms:Disable*
+          #     - kms:Get*
+          #     - kms:Delete*
+          #     - kms:ScheduleKeyDeletion
+          #     - kms:CancelKeyDeletion
+          #   Resource: "*"
           - Sid: Allow codestar
             Effect: Allow
             Principal:
