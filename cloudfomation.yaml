@@ -171,7 +171,6 @@ Resources:
           import boto3
           import os
           import urllib3
-          from base64 import b64encode
 
           codepipeline_client = boto3.client('codepipeline')
           integration_token = os.environ['INTEGRATION_AUTH_TOKEN']
@@ -240,11 +239,9 @@ Resources:
             else:
               return()
 
-            encode_token = b64encode(integration_token.encode()).decode()
-
             http = urllib3.PoolManager()
             r = http.request('POST', url,
-            headers={'Accept': 'application/json', 'Content-Type': 'application/json', 'User-Agent': 'Curl/0.1', 'Authorization' : 'Bearer %s' %  encode_token},
+            headers={'Accept': 'application/json', 'Content-Type': 'application/json', 'User-Agent': 'Curl/0.1', 'Authorization' : 'Bearer %s' % integration_token},
             body=json.dumps(build_status).encode('utf-8')
             )
 
